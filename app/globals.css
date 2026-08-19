@@ -1,0 +1,114 @@
+@import "tailwindcss";
+
+:root {
+  /* Ledgerly token system — an AP clerk's desk: green ledger paper, ink,
+     an approval/hold stamp, and currency gold for amounts. */
+  --ledger: #eef3ea;      /* pale ledger-paper green — distinct from Mentara's dark chalkboard green */
+  --ledger-dim: #e2ead9;
+  --column-line: #c9d6bd; /* faint ruling lines */
+  --ink: #1c2318;
+  --ink-soft: #52604a;
+  --approved: #2f7d4f;
+  --approved-soft: #dcefe1;
+  --hold: #b3392c;
+  --hold-soft: #f6ded9;
+  --currency: #a67c1e;
+  --currency-soft: #f2e6c8;
+
+  --ease: cubic-bezier(0.16, 0.8, 0.24, 1);
+
+  --font-display: var(--font-slab);
+  --font-body: var(--font-plex-sans);
+  --font-mono: var(--font-courier);
+}
+
+@theme inline {
+  --color-ledger: var(--ledger);
+  --color-ledger-dim: var(--ledger-dim);
+  --color-column-line: var(--column-line);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-approved: var(--approved);
+  --color-approved-soft: var(--approved-soft);
+  --color-hold: var(--hold);
+  --color-hold-soft: var(--hold-soft);
+  --color-currency: var(--currency);
+  --color-currency-soft: var(--currency-soft);
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
+  --font-mono: var(--font-mono);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--ledger);
+  color: var(--ink);
+  font-family: var(--font-body);
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent,
+    transparent 34px,
+    var(--column-line) 34px,
+    var(--column-line) 35px
+  );
+}
+
+::selection {
+  background: var(--currency);
+  color: var(--ledger);
+}
+
+:focus-visible {
+  outline: 2px solid var(--currency);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+.mask {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+}
+.mask i {
+  display: inline-block;
+  font-style: normal;
+}
+
+.reveal {
+  opacity: 1;
+}
+
+.grain-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.02;
+  mix-blend-mode: multiply;
+  z-index: 60;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mask i {
+    transform: none !important;
+  }
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "accuracy": 0.877,
+  "testSize": 1000,
+  "trainSize": 4000,
+  "classes": [
+    "reject",
+    "needs_review",
+    "auto_approve"
+  ],
+  "perClass": [
+    {
+      "label": "reject",
+      "precision": 0.9627329192546584,
+      "recall": 0.9393939393939394,
+      "f1": 0.950920245398773,
+      "support": 165
+    },
+    {
+      "label": "needs_review",
+      "precision": 0.8721590909090909,
+      "recall": 0.7974025974025974,
+      "f1": 0.8331071913161465,
+      "support": 385
+    },
+    {
+      "label": "auto_approve",
+      "precision": 0.8521560574948666,
+      "recall": 0.9222222222222223,
+      "f1": 0.8858057630736392,
+      "support": 450
+    }
+  ],
+  "confusionMatrix": [
+    [
+      155,
+      10,
+      0
+    ],
+    [
+      6,
+      307,
+      72
+    ],
+    [
+      0,
+      35,
+      415
+    ]
+  ]
+}
