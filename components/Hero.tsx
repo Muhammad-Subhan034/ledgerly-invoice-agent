@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import Link from "next/link";
 import StampReveal from "./StampReveal";
+import LedgerField from "./LedgerField";
 
 export default function Hero() {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -45,7 +46,13 @@ export default function Hero() {
   }, []);
 
   return (
-    <section ref={rootRef} className="mx-auto max-w-6xl px-6 pb-20 pt-16 md:pt-24">
+    <section ref={rootRef} className="relative overflow-hidden">
+      <LedgerField />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-ledger"
+      />
+      <div className="relative mx-auto max-w-6xl px-6 pb-20 pt-16 md:pt-24">
       <div className="grid items-center gap-16 md:grid-cols-[1.1fr_0.9fr]">
         <div>
           <p
@@ -73,13 +80,19 @@ export default function Hero() {
           <div data-hero-fade className="mt-9 flex flex-wrap items-center gap-4">
             <Link
               href="/process"
-              className="rounded-sm bg-ink px-6 py-3 font-mono text-[13px] uppercase tracking-wide text-ledger transition-transform hover:-translate-y-0.5"
+              data-cursor-hover
+              className="group relative overflow-hidden rounded-sm bg-ink px-6 py-3 font-mono text-[13px] uppercase tracking-wide text-ledger transition-transform hover:-translate-y-0.5"
             >
-              Process an invoice →
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-ledger/20 to-transparent transition-transform duration-700 ease-out group-hover:translate-x-full"
+              />
+              <span className="relative">Process an invoice →</span>
             </Link>
             <Link
               href="/purchase-orders"
-              className="rounded-sm border border-ink/25 px-6 py-3 font-mono text-[13px] uppercase tracking-wide text-ink transition-colors hover:bg-ledger-dim"
+              data-cursor-hover
+              className="rounded-sm border border-ink/25 px-6 py-3 font-mono text-[13px] uppercase tracking-wide text-ink transition-colors hover:border-currency/50 hover:bg-ledger-dim"
             >
               View purchase orders
             </Link>
@@ -88,6 +101,7 @@ export default function Hero() {
         <div className="flex justify-center md:justify-end">
           <StampReveal />
         </div>
+      </div>
       </div>
     </section>
   );

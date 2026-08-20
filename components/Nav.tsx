@@ -16,7 +16,11 @@ export default function Nav() {
   return (
     <header className="sticky top-0 z-50 border-b border-ink/12 bg-ledger/97">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-        <Link href="/" className="font-display text-lg font-semibold tracking-tight text-ink">
+        <Link
+          href="/"
+          data-cursor-hover
+          className="font-display text-lg font-semibold tracking-tight text-ink transition-colors hover:text-currency"
+        >
           Ledgerly
         </Link>
         <nav className="flex items-center gap-1 font-mono text-[13px] uppercase tracking-wide">
@@ -26,6 +30,7 @@ export default function Nav() {
               <Link
                 key={link.href}
                 href={link.href}
+                data-cursor-hover
                 className={`rounded-sm px-3 py-1.5 transition-colors ${
                   active ? "bg-ink text-ledger" : "text-ink-soft hover:bg-ledger-dim"
                 }`}

@@ -1,6 +1,7 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import gsap from "gsap";
 
 type ProcessResult = {
   extracted: {
@@ -39,12 +40,15 @@ export default function ProcessForm() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<ProcessResult | null>(null);
+  const [barsReady, setBarsReady] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const resultRef = useRef<HTMLDivElement>(null);
 
   async function run() {
     setBusy(true);
     setError(null);
     setResult(null);
+    setBarsReady(false);
     try {
       let res: Response;
       const url = `/api/process?threshold=${threshold}`;
@@ -62,12 +66,27 @@ export default function ProcessForm() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Processing failed");
       setResult(data);
+      // Two rAFs so the browser paints the 0-width bars before the
+      // transition to their real widths kicks in.
+      requestAnimationFrame(() => requestAnimationFrame(() => setBarsReady(true)));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
       setBusy(false);
     }
   }
+
+  useEffect(() => {
+    if (!result || !resultRef.current) return;
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduceMotion) return;
+
+    gsap.fromTo(
+      resultRef.current,
+      { opacity: 0, y: 18, scale: 0.98 },
+      { opacity: 1, y: 0, scale: 1, duration: 0.7, ease: "power3.out" }
+    );
+  }, [result]);
 
   const canSubmit = mode === "upload" ? Boolean(file) : Boolean(text.trim());
 
@@ -77,7 +96,7 @@ export default function ProcessForm() {
         <div className="flex gap-2 border-b border-ink/10 pb-4">
           <button
             onClick={() => setMode("upload")}
-            className={`rounded-sm px-3 py-1.5 font-mono text-[12px] uppercase tracking-wide ${
+            className={`rounded-sm px-3 py-1.5 font-mono text-[12px] uppercase tracking-wide transition-colors ${
               mode === "upload" ? "bg-ink text-ledger" : "border border-ink/20 text-ink-soft"
             }`}
           >
@@ -85,7 +104,7 @@ export default function ProcessForm() {
           </button>
           <button
             onClick={() => setMode("paste")}
-            className={`rounded-sm px-3 py-1.5 font-mono text-[12px] uppercase tracking-wide ${
+            className={`rounded-sm px-3 py-1.5 font-mono text-[12px] uppercase tracking-wide transition-colors ${
               mode === "paste" ? "bg-ink text-ledger" : "border border-ink/20 text-ink-soft"
             }`}
           >
@@ -102,7 +121,7 @@ export default function ProcessForm() {
               if (f) setFile(f);
             }}
             onClick={() => fileInputRef.current?.click()}
-            className="mt-4 flex cursor-pointer flex-col items-center justify-center rounded-sm border-2 border-dashed border-ink/25 px-6 py-10 text-center hover:border-currency"
+            className="mt-4 flex cursor-pointer flex-col items-center justify-center rounded-sm border-2 border-dashed border-ink/25 px-6 py-10 text-center transition-colors hover:border-currency"
           >
             <input
               ref={fileInputRef}
@@ -148,15 +167,20 @@ export default function ProcessForm() {
         <button
           onClick={run}
           disabled={busy || !canSubmit}
-          className="mt-4 rounded-sm bg-ink px-5 py-2.5 font-mono text-[13px] uppercase tracking-wide text-ledger disabled:opacity-40"
+          data-cursor-hover
+          className="group relative mt-4 overflow-hidden rounded-sm bg-ink px-5 py-2.5 font-mono text-[13px] uppercase tracking-wide text-ledger transition-transform hover:-translate-y-0.5 disabled:pointer-events-none disabled:opacity-40 disabled:hover:translate-y-0"
         >
-          {busy ? "Processing…" : "Process invoice"}
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-ledger/20 to-transparent transition-transform duration-700 ease-out group-hover:translate-x-full"
+          />
+          <span className="relative">{busy ? "Processing…" : "Process invoice"}</span>
         </button>
         {error && <p className="mt-3 text-sm text-hold">{error}</p>}
       </div>
 
       {result && (
-        <div className="mt-8 space-y-4">
+        <div ref={resultRef} className="mt-8 space-y-4">
           <div className={`rounded-sm border p-5 ${DECISION_TONE[result.approval.decision]} bg-white`}>
             <div className="flex flex-wrap items-center justify-between gap-2">
               <p className="font-display text-xl font-semibold text-ink">{result.extracted.vendor}</p>
@@ -199,8 +223,8 @@ export default function ProcessForm() {
                     </span>
                     <div className="h-2 flex-1 rounded-full bg-ink/10">
                       <div
-                        className="h-2 rounded-full bg-currency"
-                        style={{ width: `${Math.round(prob * 100)}%` }}
+                        className="h-2 rounded-full bg-currency transition-[width] duration-700 ease-out"
+                        style={{ width: `${barsReady ? Math.round(prob * 100) : 0}%` }}
                       />
                     </div>
                     <span className="w-10 shrink-0 text-right font-mono text-[11px] text-ink-soft">

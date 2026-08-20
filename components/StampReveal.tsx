@@ -9,10 +9,13 @@ const LINE_ITEMS = [
   { desc: "Support plan", qty: "1", amount: "$400.00" },
 ];
 
+const TOTAL = 1958.5;
+
 export default function StampReveal() {
   const scanRef = useRef<HTMLDivElement>(null);
   const rowRefs = useRef<Array<HTMLDivElement | null>>([]);
   const stampRef = useRef<HTMLDivElement>(null);
+  const totalRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -24,7 +27,9 @@ export default function StampReveal() {
 
     gsap.set(rowRefs.current, { opacity: 0, x: -10 });
     gsap.set(stampRef.current, { opacity: 0, scale: 1.6, rotate: -8 });
+    if (totalRef.current) totalRef.current.textContent = "$0.00";
 
+    const counter = { val: 0 };
     const tl = gsap.timeline({ delay: 0.5 });
     tl.fromTo(
       scanRef.current,
@@ -37,6 +42,18 @@ export default function StampReveal() {
         "-=1.1"
       )
       .to(scanRef.current, { opacity: 0, duration: 0.3 }, "-=0.3")
+      .to(
+        counter,
+        {
+          val: TOTAL,
+          duration: 0.7,
+          ease: "power1.out",
+          onUpdate: () => {
+            if (totalRef.current) totalRef.current.textContent = `$${counter.val.toFixed(2)}`;
+          },
+        },
+        "-=0.5"
+      )
       .to(stampRef.current, {
         opacity: 1,
         scale: 1,
@@ -80,7 +97,9 @@ export default function StampReveal() {
       </div>
       <div className="mt-3 flex items-center justify-between border-t border-ink/10 pt-3 font-mono text-sm">
         <span className="text-ink-soft">Total</span>
-        <span className="font-semibold text-currency">$1,958.50</span>
+        <span ref={totalRef} className="font-semibold text-currency tabular-nums">
+          $1,958.50
+        </span>
       </div>
 
       <div className="relative mt-5 flex h-16 items-center justify-center">

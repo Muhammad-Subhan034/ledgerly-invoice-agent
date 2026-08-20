@@ -1,5 +1,5 @@
-import Link from "next/link";
 import Reveal from "./Reveal";
+import FeatureCard from "./FeatureCard";
 
 const FEATURES = [
   {
@@ -27,24 +27,13 @@ const FEATURES = [
 export default function FeatureGrid() {
   return (
     <section className="mx-auto max-w-6xl px-6 py-20">
-      <Reveal as="p" className="font-mono text-[11px] uppercase tracking-widest text-currency">
+      <Reveal as="p" variant="clip-wipe" className="font-mono text-[11px] uppercase tracking-widest text-currency">
         What's actually running
       </Reveal>
       <div className="mt-10 grid gap-6 md:grid-cols-2">
         {FEATURES.map((feature, i) => (
-          <Reveal key={feature.href} delay={i * 0.05}>
-            <Link
-              href={feature.href}
-              className="group block h-full rounded-sm border border-ink/12 bg-white p-7 transition-colors hover:border-ink/30"
-            >
-              <div className="flex items-center justify-between">
-                <h3 className="font-display text-2xl font-semibold text-ink">{feature.title}</h3>
-                <span className="font-mono text-ink-soft transition-transform group-hover:translate-x-1">
-                  →
-                </span>
-              </div>
-              <p className="mt-3 text-sm leading-relaxed text-ink-soft">{feature.body}</p>
-            </Link>
+          <Reveal key={feature.href} variant="scale-in" delay={i * 0.06}>
+            <FeatureCard href={feature.href} title={feature.title} body={feature.body} />
           </Reveal>
         ))}
       </div>
